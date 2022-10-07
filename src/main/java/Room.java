@@ -1,10 +1,11 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
     private int roomNumber;
     private int pricePerNight;
     private int numberOfPerson;
-    private List<Reservation> reservationList;
+    private List<Reservation> reservationList = new ArrayList<>();
 
     public Room(int roomNumber, int pricePerNight, int numberOfPerson) {
         this.roomNumber = roomNumber;
