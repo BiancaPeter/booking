@@ -5,6 +5,7 @@ public class Room {
     private int roomNumber;
     private int pricePerNight;
     private int numberOfPerson;
+    private String hotelName = "";
     private List<Reservation> reservationList = new ArrayList<>();
 
     public Room(int roomNumber, int pricePerNight, int numberOfPerson) {
@@ -37,6 +38,14 @@ public class Room {
         this.numberOfPerson = numberOfPerson;
     }
 
+    public String getHotelName() {
+        return hotelName;
+    }
+
+    public void setHotelName(String hotelName) {
+        this.hotelName = hotelName;
+    }
+
     public List<Reservation> getReservationList() {
         return reservationList;
     }
@@ -54,6 +63,8 @@ public class Room {
                 ", reservationList=" + reservationList +
                 '}';
     }
+
+
 
 
 }

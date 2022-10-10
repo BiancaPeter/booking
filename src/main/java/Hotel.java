@@ -26,5 +26,23 @@ public class Hotel {
         this.roomList = roomList;
     }
 
+    public Room getRoomFromHotelByNumber(int roomNumber) {
+        for (Room room : getRoomList()) {
+            if (room.getRoomNumber() == roomNumber) {
+                return room;
+            }
+        }
+        return null;
+    }
+
+    public int getIndexOfRoomFromHotelBy(int roomNumber) {
+        for (int i = 0; i < roomList.size(); i++) {
+            if (getRoomList().get(i).getRoomNumber() == roomNumber) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }
 

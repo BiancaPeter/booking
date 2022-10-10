@@ -7,11 +7,6 @@ public class Client extends User {
         super(lastName, firstName);
     }
 
-    //am parcurs lista de hoteluri din aplicatie
-    //pentru fiecare hotel am parcurs lista de camere
-    //daca camera are lista de rezervari nula atunci camera este libera
-    //daca lista de rezervari a camerei nu este nula atunci parcurgem fiecare rezervare si verificam daca nu exista o rezervare
-    //    cu aceleasi date de checkIn si checkOut
     public void getAvailableRooms(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         System.out.println("The list of available rooms during the period " + checkIn + " - " + checkOut + " are: ");
         for (Hotel hotel : booking.getHotelList()) {
@@ -35,7 +30,8 @@ public class Client extends User {
         }
     }
 
-    public List<Room> getSortedListOfAvailableRoomsByPriceForACertainPeriodAndACertainNumberOfPlaces(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
+
+    public List<Room> getAvailableRoomsOrderedByPriceBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         List<Room> sortedListOfAvailableRooms = new ArrayList<>();
         boolean isAvailable = true;
         for (Hotel hotel : booking.getHotelList()) {
@@ -60,13 +56,13 @@ public class Client extends User {
         return sortedListOfAvailableRooms;
     }
 
-    public void bookARoom(Room room, Hotel hotel, LocalDate checkIn, LocalDate checkOut, Client client) {
-//clientul (care e un user) are o lista de rezervari iar lista de rezervari are ca atribut un client
-//fapt ce il baga in ciclu infinit
-//asa ca nu ar trebui sa adaugam rezervarea in lista de rezervari a clientului (nu ar trebui sa avem o lista de rezervari pt client?)...
-//TODO: cum putem rezolva problema de mai sus
-
-//      reservationList.add(new Reservation(room.getRoomNumber(), client, checkIn, checkOut));
-        hotel.getRoomList().get(hotel.getRoomList().indexOf(room)).getReservationList().add(new Reservation(room.getRoomNumber(), client, checkIn, checkOut));
+    public void bookARoom(int roomNumber, Hotel hotel, LocalDate checkIn, LocalDate checkOut) throws RoomNotFoundException {
+        int indexOfRoom = hotel.getIndexOfRoomFromHotelBy(roomNumber);
+        if (indexOfRoom == -1) {
+            throw new RoomNotFoundException("The room with numberRoom " + roomNumber + " is not in the hotel " + hotel.getHotelName());
+        }
+        Reservation reservation = new Reservation(hotel.getRoomList().get(indexOfRoom).getRoomNumber(), checkIn, checkOut);
+        reservationList.add(reservation);
+        hotel.getRoomList().get(indexOfRoom).getReservationList().add(reservation);
     }
 }
