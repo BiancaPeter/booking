@@ -1,5 +1,7 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Room {
     private int roomNumber;
@@ -54,17 +56,19 @@ public class Room {
         this.reservationList = reservationList;
     }
 
+    public boolean areReservationsAfterCheckinAndBeforeCheckout(LocalDate checkIn, LocalDate checkOut){
+       return reservationList.stream().
+                anyMatch(reservation -> reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut));
+    }
+
     @Override
     public String toString() {
         return "Room{" +
-                "numberRoom=" + roomNumber +
+                "roomNumber=" + roomNumber +
                 ", pricePerNight=" + pricePerNight +
                 ", numberOfPerson=" + numberOfPerson +
+                ", hotelName='" + hotelName + '\'' +
                 ", reservationList=" + reservationList +
                 '}';
     }
-
-
-
-
 }

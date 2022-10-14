@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 public class DB {
     public DB() {
     }
@@ -36,5 +38,12 @@ public class DB {
         admin.addRoom(room10, hotel3);
         admin.addRoom(room11, hotel3);
         admin.addRoom(room12, hotel3);
+
+        Reservation reservation1 = new Reservation(2,LocalDate.of(2022,8,20),LocalDate.of(2022,8,22));
+        Reservation reservation2 = new Reservation(2,LocalDate.of(2022,8,28),LocalDate.of(2022,8,29));
+        hotel1.getRoomList().get(1).getReservationList().add(reservation1);
+        hotel1.getRoomList().get(1).getReservationList().add(reservation2);
+
+
     }
 }

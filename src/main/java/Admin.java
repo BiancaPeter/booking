@@ -36,48 +36,48 @@ public class Admin extends User {
         hotel.getRoomList().get(hotel.getRoomList().indexOf(room)).setPricePerNight(newPrice);
     }
 
-    public int getNumberOfAvailableRooms(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
+    public int getNumberOfAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
         System.out.println("The number of available rooms during the period " + checkIn + " - " + checkOut + " are: ");
         int numberOfAvailableRooms = 0;
-        boolean isAvailable = true;
+        boolean isAvailable;
         for (Room room : hotel.getRoomList()) {
-            if (room.getReservationList() == null) {
+            isAvailable = true;
+            for (Reservation reservation : room.getReservationList()) {
+                if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
+                    isAvailable = false;
+                }
+            }
+            if (isAvailable) {
                 numberOfAvailableRooms++;
-            } else {
-                for (Reservation reservation : room.getReservationList()) {
-                    if (reservation.getCheckIn() == checkIn && reservation.getCheckOut() == checkOut) {
-                        isAvailable = false;
-                    }
-                }
-                if (isAvailable) {
-                    numberOfAvailableRooms++;
-                }
             }
         }
         return numberOfAvailableRooms;
     }
 
-//    public int findNumberOfAvailableRooms(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
-//        return hotel.getRoomList().stream()
-//                .filter(room -> room.getReservationList().stream().anyMatch(reservation -> (reservation.getCheckIn().isEqual(checkIn)|| (reservation.getCheckIn().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)))&&(reservation.getCheckOut() == checkOut || (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckOut().isBefore(checkOut))))
-//
-//    }
+    public long findNumberOfAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
+        return hotel.getRoomList().stream()
+                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut))
+                .count();
+    }
 
-    public long getPriceObtainedFromAllReservationsFromACertainPeriod(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
+    public long getPriceForAllReservationsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
         long totalPrice = 0;
         long numberOfDaysReservedForTheRoom;
         for (Room room : hotel.getRoomList()) {
-            if (room.getReservationList() != null) { //am pus conditia aceasta pt a elimina eroarea null pointer exception, trebuie tratata exceptia
-                for (Reservation reservation : room.getReservationList()) {
-                    numberOfDaysReservedForTheRoom = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut()); //calculez numarul de zile rezervate
-                    if (reservation.getCheckIn() == checkIn || (reservation.getCheckIn().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut))) {
-                        if (reservation.getCheckOut() == checkOut || (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckOut().isBefore(checkOut))) {
-                            totalPrice += room.getPricePerNight() * numberOfDaysReservedForTheRoom;  //la pretul total adaug pretul camerei per noapte * numarul de zile aferente rezervarii
-                        }
-                    }
+            for (Reservation reservation : room.getReservationList()) {
+                numberOfDaysReservedForTheRoom = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut());
+                if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
+                    totalPrice += room.getPricePerNight() * numberOfDaysReservedForTheRoom;
                 }
             }
         }
         return totalPrice;
+    }
+
+    public Integer findPriceForAllReservationsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
+        return hotel.getRoomList().stream()
+                .filter(room -> room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut))
+                .reduce((0), (sum, room) -> sum + (room.getPricePerNight() * (int) (ChronoUnit.DAYS.between(checkIn, checkOut))), Integer::sum);
+
     }
 }

@@ -102,7 +102,8 @@ public class Main {
                 System.out.println("Enter the check-out date");
                 String stringCheckout = console.next();
                 LocalDate checkOut = LocalDate.parse(stringCheckout);
-                System.out.println(admin.getNumberOfAvailableRooms(checkIn, checkOut, hotel));
+                System.out.println(admin.getNumberOfAvailableRoomsBy(checkIn, checkOut, hotel));
+                System.out.println("java8: " + admin.findNumberOfAvailableRoomsBy(checkIn, checkOut, hotel));
                 break;
             case 6:
                 System.out.println("Enter the check-in date");
@@ -111,7 +112,8 @@ public class Main {
                 System.out.println("Enter the check-out date");
                 stringCheckout = console.next();
                 checkOut = LocalDate.parse(stringCheckout);
-                System.out.println("The price obtained from all reservations for the entered period: " + admin.getPriceObtainedFromAllReservationsFromACertainPeriod(checkIn, checkOut, hotel));
+                System.out.println("The price obtained from all reservations for the entered period: " + admin.getPriceForAllReservationsBy(checkIn, checkOut, hotel));
+                System.out.println("java8: " + admin.findPriceForAllReservationsBy(checkIn, checkOut, hotel));
                 break;
             case 7:
                 System.out.println("You have exited the admin menu");
@@ -132,7 +134,9 @@ public class Main {
                 LocalDate checkOut = LocalDate.parse(stringCheckout);
                 System.out.println("Enter the number of people who can stay in the room");
                 int numberOfPerson = console.nextInt();
-                client.getAvailableRooms(checkIn, checkOut, numberOfPerson, booking);
+                System.out.println("The list of available rooms during the period " + checkIn + " - " + checkOut + " are: ");
+                System.out.println(client.getAvailableRoomsBy(checkIn, checkOut, numberOfPerson, booking));
+                System.out.println("java8: " + client.findAvailableRoomsBy(checkIn, checkOut, numberOfPerson, booking));
                 break;
             case 2:
                 System.out.println("Enter the check-in date");
@@ -144,10 +148,8 @@ public class Main {
                 System.out.println("Enter the number of people who can stay in the room");
                 numberOfPerson = console.nextInt();
                 System.out.println("The sorted list with the available rooms by price for a certain period and a certain number of places is: ");
-                List<Room> availableRoomsOrderedByPrice = client.getAvailableRoomsOrderedByPriceBy(checkIn, checkOut, numberOfPerson, booking);
-                for (Room room : availableRoomsOrderedByPrice) {
-                    System.out.println(room.getHotelName() + ": " + room);
-                }
+                System.out.println(client.getAvailableRoomsOrderedByPriceBy(checkIn, checkOut, numberOfPerson, booking));
+                System.out.println("java8: " + client.findAvailableRoomsOrderedByPriceBy(checkIn, checkOut, numberOfPerson, booking));
                 break;
             case 3:
                 System.out.println("Enter the check-in date");

@@ -1,59 +1,53 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Client extends User {
     public Client(String lastName, String firstName) {
         super(lastName, firstName);
     }
 
-    public void getAvailableRooms(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
-        System.out.println("The list of available rooms during the period " + checkIn + " - " + checkOut + " are: ");
+    public List<Room> getAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
+        List<Room> availableRooms = new ArrayList<>();
+        boolean isAvailable;
         for (Hotel hotel : booking.getHotelList()) {
             for (Room room : hotel.getRoomList()) {
-                boolean isAvailable = true;
+                isAvailable = true;
                 if (room.getNumberOfPerson() == numberOfPerson) {
-                    if (room.getReservationList() == null) {
-                        System.out.println("Hotel " + hotel.getHotelName() + " room " + room);
-                    } else {
-                        for (Reservation reservation : room.getReservationList()) {
-                            if (reservation.getCheckIn() == checkIn && reservation.getCheckOut() == checkOut) {
-                                isAvailable = false;
-                            }
+                    for (Reservation reservation : room.getReservationList()) {
+                        if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
+                            isAvailable = false;
                         }
-                        if (isAvailable) {
-                            System.out.println("Hotel " + hotel.getHotelName() + " room " + room);
-                        }
+                    }
+                    if (isAvailable) {
+                        availableRooms.add(room);
                     }
                 }
             }
         }
+        return availableRooms;
     }
 
+    public List<Room> findAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
+        return booking.getHotelList().stream()
+                .flatMap(hotel -> hotel.getRoomList().stream())
+                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
+                .collect(Collectors.toList());
+    }
 
     public List<Room> getAvailableRoomsOrderedByPriceBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
-        List<Room> sortedListOfAvailableRooms = new ArrayList<>();
-        boolean isAvailable = true;
-        for (Hotel hotel : booking.getHotelList()) {
-            for (Room room : hotel.getRoomList()) {
-                if (room.getNumberOfPerson() == numberOfPerson) {
-                    if (room.getReservationList() == null) {
-                        sortedListOfAvailableRooms.add(room);
-                    } else {
-                        for (Reservation reservation : room.getReservationList()) {
-                            if (reservation.getCheckIn() == checkIn && reservation.getCheckOut() == checkOut) {
-                                isAvailable = false;
-                            }
-                        }
-                        if (isAvailable) {
-                            sortedListOfAvailableRooms.add(room);
-                        }
-                    }
-                }
-            }
-        }
+        List<Room> sortedListOfAvailableRooms = getAvailableRoomsBy(checkIn, checkOut, numberOfPerson, booking);
         sortedListOfAvailableRooms.sort(new PriceComparator());
         return sortedListOfAvailableRooms;
+    }
+
+    public List<Room> findAvailableRoomsOrderedByPriceBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
+        return booking.getHotelList().stream()
+                .flatMap(hotel -> hotel.getRoomList().stream())
+                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
+                .sorted(new PriceComparator())
+                .collect(Collectors.toList());
     }
 
     public void bookARoom(int roomNumber, Hotel hotel, LocalDate checkIn, LocalDate checkOut) throws RoomNotFoundException {
