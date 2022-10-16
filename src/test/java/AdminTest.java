@@ -9,15 +9,23 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
 public class AdminTest {
-    @BeforeAll
-    public void createDB() {
-        Booking booking = new Booking();
 
+    //    @BeforeAll
+    static void createDB(Booking booking) {
         Hotel hotel1 = new Hotel("Continental");
         Hotel hotel2 = new Hotel("Grand");
         Hotel hotel3 = new Hotel("Litoral");
+
+        Admin admin1 = new Admin("Pop", "Eugen");
+        booking.getUserList().add(admin1);
+
+        Client client1 = new Client("Suciu", "Daniel");
+        booking.getUserList().add(client1);
+
+        Client client2 = new Client("Natea", "Valentina");
+        booking.getUserList().add(client2);
 
         Admin admin = (Admin) booking.getUserList().get(0);
         admin.addHotel(hotel1, booking);
@@ -53,12 +61,61 @@ public class AdminTest {
     @Test
     void testAvailableRooms_ShouldReturnNumberOfAvailableRooms() {
         //given
-
+//TODO: daca ma folosesc de adnotarea @BeforeAll, mut new Booking la inceput si elimin apelul de metoda createDB,
+// se genereaza o eroare:"Index 0 out of bounds for length 0"...
+        Booking booking = new Booking();
+        createDB(booking);
+        Admin admin = new Admin("", "");
+//TODO: @Mock' not applicable to local variable --->
+// asa ca daca adnotez obiectul admin cu mock in afara metodei de test, codul trece de compilare dar genereaza eroare....
         //when
-        int numberOfAvailableRooms = admin.getNumberOfAvailableRoomsBy();
+        int numberOfAvailableRooms = admin.getNumberOfAvailableRoomsBy(LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22), booking.getHotelList().get(0));
         //then
         assertEquals(4, numberOfAvailableRooms);
     }
 
+    @Test
+    void testFindAvailableRooms_ShouldReturnNumberOfAvailableRooms() {
+        //given
+        Booking booking = new Booking();
+        createDB(booking);
+        Admin admin = new Admin("", "");
+        //when
+        long numberOfAvailableRooms = admin.findNumberOfAvailableRoomsBy(LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22), booking.getHotelList().get(0));
+        //then
+        assertEquals(4, numberOfAvailableRooms);
+    }
+
+    @Test
+    void testPriceForAllReservationsBy_ShouldReturnSumForAllReservationsBy() {
+        //given
+        Booking booking = new Booking();
+        createDB(booking);
+        Admin admin = new Admin("", "");
+        Reservation reservation1 = new Reservation(2, LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22));
+        Reservation reservation2 = new Reservation(2, LocalDate.of(2022, 8, 28), LocalDate.of(2022, 8, 29));
+        booking.getHotelList().get(0).getRoomList().get(1).getReservationList().add(reservation1);
+        booking.getHotelList().get(0).getRoomList().get(1).getReservationList().add(reservation2);
+        //when
+        long sumForAllReservations = admin.getPriceForAllReservationsBy(LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22), booking.getHotelList().get(0));
+        //then
+        assertEquals(300, sumForAllReservations);
+    }
+
+    @Test
+    void testFindPriceForAllReservationsBy_ShouldReturnSumForAllReservationsBy() {
+        //given
+        Booking booking = new Booking();
+        createDB(booking);
+        Admin admin = new Admin("", "");
+        Reservation reservation1 = new Reservation(2, LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22));
+        Reservation reservation2 = new Reservation(2, LocalDate.of(2022, 8, 28), LocalDate.of(2022, 8, 29));
+        booking.getHotelList().get(0).getRoomList().get(1).getReservationList().add(reservation1);
+        booking.getHotelList().get(0).getRoomList().get(1).getReservationList().add(reservation2);
+        //when
+        long sumForAllReservations = admin.findPriceForAllReservationsBy(LocalDate.of(2022, 8, 20), LocalDate.of(2022, 8, 22), booking.getHotelList().get(0));
+        //then
+        assertEquals(300, sumForAllReservations);
+    }
 
 }
