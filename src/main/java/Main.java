@@ -4,18 +4,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
-        //TODO
-        //la pornirea aplicatiei, putem incarca dintr-un fisier camerele dintr-un hotel
-        // (sau sa avem mai multe fisiere cu camerele pentru mai multe hotele - un fisier per hotel)
-        //cu ce citim, bagam in lista de camere din lista de hoteluri
-
-        //TODO
-        //teste pentru metode
-
-        //TODO
-        //lambda
-
         Scanner console = new Scanner(System.in);
 
         Booking booking = new Booking();
@@ -38,7 +26,6 @@ public class Main {
         accessedAdminMenuInLoop(admin, booking.getHotelList().get(0), console);
 
         accessedClientMenuInLoop(client, booking, booking.getHotelList().get(0), console);
-
     }
 
     public static void accessedAdminMenuInLoop(Admin admin, Hotel hotel, Scanner console) {

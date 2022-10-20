@@ -1,5 +1,7 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,18 +12,17 @@ public class Client extends User {
 
     public List<Room> getAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         List<Room> availableRooms = new ArrayList<>();
-        boolean isAvailable;
         for (Hotel hotel : booking.getHotelList()) {
             for (Room room : hotel.getRoomList()) {
-                isAvailable = true;
                 if (room.getNumberOfPerson() == numberOfPerson) {
-                    for (Reservation reservation : room.getReservationList()) {
-                        if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
-                            isAvailable = false;
-                        }
-                    }
-                    if (isAvailable) {
+                    if (room.getReservationList().isEmpty()) {
                         availableRooms.add(room);
+                    } else {
+                        for (Reservation reservation : room.getReservationList()) {
+                            if (reservation.getCheckOut().isBefore(checkIn) && reservation.getCheckIn().isAfter(checkOut)) {
+                                availableRooms.add(room);
+                            }
+                        }
                     }
                 }
             }
@@ -32,21 +33,21 @@ public class Client extends User {
     public List<Room> findAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         return booking.getHotelList().stream()
                 .flatMap(hotel -> hotel.getRoomList().stream())
-                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
+                .filter(room -> !room.isReservedRoomBetween(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
                 .collect(Collectors.toList());
     }
 
     public List<Room> getAvailableRoomsOrderedByPriceBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         List<Room> sortedListOfAvailableRooms = getAvailableRoomsBy(checkIn, checkOut, numberOfPerson, booking);
-        sortedListOfAvailableRooms.sort(new PriceComparator());
+        Collections.sort(sortedListOfAvailableRooms);
         return sortedListOfAvailableRooms;
     }
 
     public List<Room> findAvailableRoomsOrderedByPriceBy(LocalDate checkIn, LocalDate checkOut, int numberOfPerson, Booking booking) {
         return booking.getHotelList().stream()
                 .flatMap(hotel -> hotel.getRoomList().stream())
-                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
-                .sorted(new PriceComparator())
+                .filter(room -> !room.isReservedRoomBetween(checkIn, checkOut) && room.getNumberOfPerson() == numberOfPerson)
+                .sorted(Comparator.comparingInt(Room::getPricePerNight))
                 .collect(Collectors.toList());
     }
 

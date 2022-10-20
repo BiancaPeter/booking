@@ -12,7 +12,7 @@ public class Admin extends User {
 
 
     public void addRoom(Room room, Hotel hotel) {
-        room.setHotelName(hotel.getHotelName()); //setez numele hotelului pentru obiectul camera
+        room.setHotelName(hotel.getHotelName());
         hotel.getRoomList().add(room);
     }
 
@@ -37,18 +37,16 @@ public class Admin extends User {
     }
 
     public int getNumberOfAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
-        System.out.println("The number of available rooms during the period " + checkIn + " - " + checkOut + " are: ");
         int numberOfAvailableRooms = 0;
-        boolean isAvailable;
         for (Room room : hotel.getRoomList()) {
-            isAvailable = true;
-            for (Reservation reservation : room.getReservationList()) {
-                if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
-                    isAvailable = false;
-                }
-            }
-            if (isAvailable) {
+            if (room.getReservationList().isEmpty()) {
                 numberOfAvailableRooms++;
+            } else {
+                for (Reservation reservation : room.getReservationList()) {
+                    if ((reservation.getCheckOut().isBefore(checkIn) && reservation.getCheckIn().isAfter(checkOut))) {
+                        numberOfAvailableRooms++;
+                    }
+                }
             }
         }
         return numberOfAvailableRooms;
@@ -56,7 +54,7 @@ public class Admin extends User {
 
     public long findNumberOfAvailableRoomsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
         return hotel.getRoomList().stream()
-                .filter(room -> !room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut))
+                .filter(room -> !room.isReservedRoomBetween(checkIn, checkOut))
                 .count();
     }
 
@@ -65,8 +63,8 @@ public class Admin extends User {
         long numberOfDaysReservedForTheRoom;
         for (Room room : hotel.getRoomList()) {
             for (Reservation reservation : room.getReservationList()) {
-                numberOfDaysReservedForTheRoom = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut());
                 if (reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut)) {
+                    numberOfDaysReservedForTheRoom = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut());
                     totalPrice += room.getPricePerNight() * numberOfDaysReservedForTheRoom;
                 }
             }
@@ -76,7 +74,7 @@ public class Admin extends User {
 
     public Integer findPriceForAllReservationsBy(LocalDate checkIn, LocalDate checkOut, Hotel hotel) {
         return hotel.getRoomList().stream()
-                .filter(room -> room.areReservationsAfterCheckinAndBeforeCheckout(checkIn, checkOut))
+                .filter(room -> room.isReservedRoomBetween(checkIn, checkOut))
                 .reduce((0), (sum, room) -> sum + (room.getPricePerNight() * (int) (ChronoUnit.DAYS.between(checkIn, checkOut))), Integer::sum);
 
     }

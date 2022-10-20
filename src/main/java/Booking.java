@@ -2,8 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Booking {
-    private List<Hotel>hotelList;
-    private List<User>userList;
+    private List<Hotel> hotelList;
+    private List<User> userList;
 
     public Booking() {
         this.hotelList = new ArrayList<>();

@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Room {
+public class Room implements Comparable<Room> {
     private int roomNumber;
     private int pricePerNight;
     private int numberOfPerson;
@@ -56,9 +56,14 @@ public class Room {
         this.reservationList = reservationList;
     }
 
-    public boolean areReservationsAfterCheckinAndBeforeCheckout(LocalDate checkIn, LocalDate checkOut){
-       return reservationList.stream().
+    public boolean isReservedRoomBetween(LocalDate checkIn, LocalDate checkOut) {
+        return reservationList.stream().
                 anyMatch(reservation -> reservation.getCheckOut().isAfter(checkIn) && reservation.getCheckIn().isBefore(checkOut));
+    }
+
+    @Override
+    public int compareTo(Room anotherRoom) {
+        return Integer.compare(pricePerNight, anotherRoom.getPricePerNight());
     }
 
     @Override
